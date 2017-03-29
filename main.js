@@ -44,14 +44,17 @@ function create() {
     map.setCollisionBetween(0, 2000, true, 'collisions');
     layers.collisions.body.immovable = true;
     game.physics.enable(player, Phaser.Physics.ARCADE);
-    player.body.collideWorldBounds = true;
+    game.physics.arcade.checkCollision.top = false;
+    game.physics.arcade.checkCollision.right = true;
+    game.physics.arcade.checkCollision.bottom = true;
+    game.physics.arcade.checkCollision.left = true;
     player.body.bounce.y = 0.1;
 
     // Variable to store the arrow key pressed
     cursors = game.input.keyboard.createCursorKeys();
 
     // // Add gravity to make it fall
-    player.body.gravity.y = 600;
+    player.body.gravity.y = 1000;
 
     //the camera will follow the player in the world
     game.camera.follow(player);
@@ -60,6 +63,12 @@ function create() {
 function update() {  
     // collision handling
     game.physics.arcade.collide(layers.collisions, player);
+
+    if(player.body.position.y >= game.world.height - player.body.height
+    && game.world.alive === true) {
+        game.world.alive = false;
+        alert("you died");
+    }
 
     // movement
     if (cursors.left.isDown) 
@@ -79,7 +88,7 @@ function update() {
 
     if (cursors.up.isDown && player.body.onFloor() && game.time.now > jumpTimer)
     {
-        player.body.velocity.y = -250;
+        player.body.velocity.y = -300;
         jumpTimer = game.time.now + 250;
     }
 }
