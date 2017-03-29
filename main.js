@@ -5,6 +5,7 @@ var game, cursors, player, map;
 var bgMtn, mgMtn; // paralax backgrounds
 var layers = {};
 var jumpTimer = 0;
+var alive = true;
 
 function preload() {  
     game.load.tilemap('map', 'assets/maps/map.json', null, Phaser.Tilemap.TILED_JSON)
@@ -44,9 +45,10 @@ function create() {
     map.setCollisionBetween(0, 2000, true, 'collisions');
     layers.collisions.body.immovable = true;
     game.physics.enable(player, Phaser.Physics.ARCADE);
+    player.body.collideWorldBounds=true;
     game.physics.arcade.checkCollision.top = false;
     game.physics.arcade.checkCollision.right = true;
-    game.physics.arcade.checkCollision.bottom = true;
+    game.physics.arcade.checkCollision.bottom = false;
     game.physics.arcade.checkCollision.left = true;
     player.body.bounce.y = 0.1;
 
@@ -65,9 +67,10 @@ function update() {
     game.physics.arcade.collide(layers.collisions, player);
 
     if(player.body.position.y >= game.world.height - player.body.height
-    && game.world.alive === true) {
-        game.world.alive = false;
+    && alive === true) {
+        player.kill();
         alert("you died");
+        alive = false;
     }
 
     // movement
