@@ -8,8 +8,19 @@ StateMain = {
         game.load.image('tileset', 'assets/png/tileset.png');
         game.load.image('player', 'assets/png/cat-walk.png');
         game.load.spritesheet('cat-walk', 'assets/png/cat-walk.png', 34, 52, 10);
-        game.load.spritesheet('cat-jump', 'assets/png/cat-jump.png', 34, 52, 10);
+        game.load.spritesheet('cat-jump', 'assets/png/cat-jump.png', 34, 52, 8);
+        game.load.spritesheet('cat-fall', 'assets/png/cat-fall.png', 34, 52, 8);
         game.load.spritesheet('cat-dead', 'assets/png/cat-dead.png', 42, 52, 10);
+
+        game.load.audio(
+            'bg-music', 
+            [
+                'assets/audio/Chippytoon.wav',
+            ]
+        );
+
+        alive = true;
+        won = false;
     },
 
     create: function() {  
@@ -17,6 +28,7 @@ StateMain = {
         this.getObjectLayers();
         this.createPlayer();
         this.createPhysics();
+        this.createMusic();
 
         // Variable to store the arrow key pressed
         cursors = game.input.keyboard.createCursorKeys();
@@ -90,6 +102,15 @@ StateMain = {
         player.body.gravity.y = 1000;
     },
 
+    /**
+     * Creates the music
+     * will not restart if it is already playing
+     */
+    createMusic: function() {
+        music = game.add.audio('bg-music');
+        music.play('', 0, 1, true, false);
+    },
+
     update: function() {  
         // collision handling
         this.handleCollisions();
@@ -119,9 +140,10 @@ StateMain = {
         && alive === true) {
             this.walkStop();
             var kill = false;
-            player.loadTexture('cat-dead', 0, false);
-            player.animations.play('dead', null, false, kill);
+            // player.loadTexture('cat-dead', 0, false);
+            // player.animations.play('dead', null, false, kill);
             alive = false;
+            game.state.start('gameover');
         }
     },
 

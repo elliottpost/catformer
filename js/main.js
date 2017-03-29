@@ -3,6 +3,7 @@ var config;
 var StateBoot, StateMain;
 var game, cursors, player, map;
 var startPoint, endPoint;
+var music;
 var bgMtn, mgMtn; // paralax backgrounds
 var layers = {};
 var jumpTimer = 0;
@@ -13,6 +14,7 @@ var won = false;
 game = new Phaser.Game(config);
 
 game.state.add('boot', StateBoot); 
-game.state.add('main', StateMain);
+game.state.add('main', StateMain); 
+game.state.add('gameover', StateGameover);
 
 game.state.start('boot');
