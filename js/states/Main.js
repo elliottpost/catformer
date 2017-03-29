@@ -6,11 +6,26 @@ StateMain = {
         game.load.image('mountains-bg', 'assets/png/mountains-bg-1024x512.png');
         game.load.image('mountain-mg', 'assets/png/mountain-mg-512x512.png');
         game.load.image('tileset', 'assets/png/tileset.png');
-        game.load.image('player', 'assets/png/cat-sprite.png');
-        game.load.spritesheet('cat', 'assets/png/cat-sprite.png', 34, 52, 10);
+        game.load.image('player', 'assets/png/cat-walk.png');
+        game.load.spritesheet('cat-walk', 'assets/png/cat-walk.png', 34, 52, 10);
+        game.load.spritesheet('cat-jump', 'assets/png/cat-jump.png', 34, 52, 10);
+        game.load.spritesheet('cat-dead', 'assets/png/cat-dead.png', 42, 52, 10);
     },
 
     create: function() {  
+        this.createWorld();
+        this.getObjectLayers();
+        this.createPlayer();
+        this.createPhysics();
+
+        // Variable to store the arrow key pressed
+        cursors = game.input.keyboard.createCursorKeys();
+    },
+
+    /** 
+     * Loads the map & layers
+     */
+    createWorld: function() {
         game.stage.backgroundColor = '#3598db';
 
         map = game.add.tilemap('map', 32, 32, config.tilesWide, 16);
@@ -27,16 +42,37 @@ StateMain = {
         layers.bgTrees = map.createLayer('bgTrees');
         layers.ground = map.createLayer('ground');
         layers.bgGrass = map.createLayer('bgGrass');
+    },
 
+    /**
+     * Saves the object layers to respective vars
+     */
+    getObjectLayers: function() {
         // get the object layers
         startPoint = map.objects.startPoint;
         endPoint = map.objects.endPoint;
+    },
 
+    /**
+     * Inserts the player
+     * preps animations
+     */
+    createPlayer: function() {
         // add the player
-        player = game.add.sprite(startPoint[0].x, startPoint[0].y, 'cat');
-        player.animations.add('walk');
+        player = game.add.sprite(startPoint[0].x, startPoint[0].y, 'cat-walk');
+        player.animations.add('walk', null, 60, true);
+        player.animations.add('jump', null, 60, false);
+        player.animations.add('dead', null, 20, false);
         player.anchor.setTo(.5,.5);
 
+        // the camera will follow the player in the world
+        game.camera.follow(player);
+    },
+
+    /**
+     * Creates & applies physics
+     */
+    createPhysics: function() {
         // Start the Arcade physics system (for movements and collisions)
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.physics.enable(layers.collisions, Phaser.Physics.ARCADE);
@@ -49,16 +85,9 @@ StateMain = {
         game.physics.arcade.checkCollision.bottom = false;
         game.physics.arcade.checkCollision.left = true;
         player.body.bounce.y = 0.1;
-        console.log(player.body);
-
-        // Variable to store the arrow key pressed
-        cursors = game.input.keyboard.createCursorKeys();
 
         // // Add gravity to make it fall
         player.body.gravity.y = 1000;
-
-        //the camera will follow the player in the world
-        game.camera.follow(player);
     },
 
     update: function() {  
@@ -79,11 +108,19 @@ StateMain = {
     handleCollisions: function() {
         game.physics.arcade.collide(layers.collisions, player);
 
-        // handles losing
+        this.handleDeath();
+    },
+
+    /**
+     * Loses the game and shows death animations
+     */
+    handleDeath: function() {
         if(player.body.position.y >= game.world.height - player.body.height
         && alive === true) {
-            player.kill();
-            alert("you died");
+            this.walkStop();
+            var kill = false;
+            player.loadTexture('cat-dead', 0, false);
+            player.animations.play('dead', null, false, kill);
             alive = false;
         }
     },
@@ -142,6 +179,10 @@ StateMain = {
         }
     },
 
+    /**
+     * Walks in a given direction
+     * @param  String dir "right" or "left"
+     */
     walkStart: function(dir) {
         player.body.velocity.x = 0;
         if (dir == "right") {
@@ -155,6 +196,9 @@ StateMain = {
         }
     },
 
+    /**
+     * Stops walking
+     */
     walkStop: function() {
         player.body.velocity.x = 0;
         player.animations.stop(null, true);
