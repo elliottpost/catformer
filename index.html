@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <script type="text/javascript" src="phaser.min.js"></script>
     <style>
       body {
         padding: 0px;
@@ -14,8 +13,11 @@
       }
       </style>
   </head>
-  <body> 
-    <!-- include the main game file -->
-    <script src="main.js"></script>
+  <body>
+    <script type="text/javascript" src="phaser.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/states/Boot.js"></script>
+    <script src="js/states/Main.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

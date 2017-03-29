@@ -1,4 +1,4 @@
-var bootState = {
+StateBoot = {
     init: function() {
         // STAGE BACKGROUND
         game.stage.backgroundColor = 0x34495f;
@@ -16,6 +16,6 @@ var bootState = {
 
     create: function() {
         // CALL LOAD STATE
-        game.state.start('load');
+        game.state.start('main');
     }
 }; 

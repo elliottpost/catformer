@@ -1,10 +1,12 @@
-var gameConfig: {
-    width: 1920,
-    height: 1080,
-    renderer: phs.AUTO,
-    parent: 'gameWrapper',
+config = {
+    width: 1024,
+    height: 512,
+    renderer: Phaser.AUTO,
+    parent: 'body',
     scaleMode: Phaser.ScaleManager.SHOW_ALL,
     fullScreenScaleMode: Phaser.ScaleManager.SHOW_ALL,
     transparent: false,
-    antialias: false
-}
+    antialias: true,
+    tilesWide: 128,
+    tilesHigh: 16
+};
