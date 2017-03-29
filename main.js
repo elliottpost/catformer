@@ -2,12 +2,15 @@ var WIDTH = 1024;
 var HEIGHT = 512;
 var TILES_WIDE = 56;
 var game, cursors, player, map;
+var startPoint, endPoint;
 var bgMtn, mgMtn; // paralax backgrounds
 var layers = {};
 var jumpTimer = 0;
 var alive = true;
+var won = false;
 
 function preload() {  
+    game.time.advancedTiming = true;
     game.load.tilemap('map', 'assets/maps/map.json', null, Phaser.Tilemap.TILED_JSON)
     game.load.image('mountains-bg', 'assets/png/mountains-bg-1024x512.png');
     game.load.image('mountain-mg', 'assets/png/mountain-mg-512x512.png');
@@ -23,19 +26,24 @@ function create() {
     map.addTilesetImage('tileset', 'tileset');
 
     // add the sky and resize the world
-    layers.sky = map.createLayer('background-sky');
+    layers.sky = map.createLayer('bgSky');
     layers.sky.resizeWorld();
     // now the backgrounds in order of appearance
     bgMtn = game.add.sprite(0, 0, 'mountains-bg');
     bgMtn.fixedToCamera = true; // lock the mountains in place
     // mgMtn = game.add.sprite(game.width/2, 0, 'mountain-mg');    
     layers.collisions = map.createLayer('collisions');
+    layers.bgTrees = map.createLayer('bgTrees');
     layers.ground = map.createLayer('ground');
-    layers.bgTrees = map.createLayer('background-trees');
-    layers.bgGrass = map.createLayer('background-grass');
+    layers.bgGrass = map.createLayer('bgGrass');
+
+    // get the object layers
+    startPoint = map.objects.startPoint;
+    endPoint = map.objects.endPoint;
+    console.log(endPoint[0]);
 
     // add the player
-    player = game.add.sprite(10, 350, 'cat');
+    player = game.add.sprite(startPoint[0].x, startPoint[0].y, 'cat');
     player.animations.add('walk');
     player.animations.play('walk', 15, true);
 
@@ -45,12 +53,13 @@ function create() {
     map.setCollisionBetween(0, 2000, true, 'collisions');
     layers.collisions.body.immovable = true;
     game.physics.enable(player, Phaser.Physics.ARCADE);
-    player.body.collideWorldBounds=true;
+    player.body.collideWorldBounds = true;
     game.physics.arcade.checkCollision.top = false;
     game.physics.arcade.checkCollision.right = true;
     game.physics.arcade.checkCollision.bottom = false;
     game.physics.arcade.checkCollision.left = true;
     player.body.bounce.y = 0.1;
+    console.log(player.body);
 
     // Variable to store the arrow key pressed
     cursors = game.input.keyboard.createCursorKeys();
@@ -94,6 +103,17 @@ function update() {
         player.body.velocity.y = -300;
         jumpTimer = game.time.now + 250;
     }
+
+    if (player.body.position.x > endPoint[0].x + player.body.width 
+    && player.body.position.y < endPoint[0].y + player.body.height
+    && alive && !won) {
+        won = true;
+        alert ("You win!");
+    }
+}
+
+function render() {
+    game.debug.text(game.time.fps || '--', 2, 14, "#ffffff");
 }
 
 function walkStart(dir) {
@@ -116,5 +136,6 @@ function walkStop() {
 game = new Phaser.Game(WIDTH, HEIGHT, Phaser.AUTO, '', {
     preload: preload,
     create: create,
-    update: update
+    update: update,
+    render: render
 });  
