@@ -45,7 +45,7 @@ function create() {
     // add the player
     player = game.add.sprite(startPoint[0].x, startPoint[0].y, 'cat');
     player.animations.add('walk');
-    player.animations.play('walk', 15, true);
+    player.anchor.setTo(.5,.5);
 
     // Start the Arcade physics system (for movements and collisions)
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -117,6 +117,7 @@ function render() {
 }
 
 function walkStart(dir) {
+    player.body.velocity.x = 0;
     if (dir == "right") {
         player.scale.x = 1;
         player.body.velocity.x = 200;
