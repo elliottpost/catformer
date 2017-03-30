@@ -1,7 +1,7 @@
 states.boot = {
     init: function() {
         // STAGE BACKGROUND
-        game.stage.backgroundColor = 0x34495f;
+        game.stage.backgroundColor = 0x111111;
 
         // PREVENT PHASER FROM STOP WHEN IFRAME IS OUT OF FOCUS
         game.stage.disableVisibilityChange = true; 
