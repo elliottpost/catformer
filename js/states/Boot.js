@@ -1,4 +1,4 @@
-StateBoot = {
+states.boot = {
     init: function() {
         // STAGE BACKGROUND
         game.stage.backgroundColor = 0x34495f;

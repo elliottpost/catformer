@@ -63,11 +63,28 @@
   </head>
   <body>
     <script type="text/javascript" src="phaser.min.js"></script>
+    <script>
+    // global vars
+    var GameConfig;
+    var AnimationConfig;
+    var states = {};
+    var game, cursors, player, map;
+    var startPoint, endPoint;
+    var music;
+    var bgMtn, mgMtn; // paralax backgrounds
+    var layers = {};
+    var jumpTimer = 0;
+    var isJumping = false;
+    var isHoldingUp = false;
+    var alive = true;
+    var won = false;
+    </script>
     <script src="js/GameConfig.js"></script>
     <script src="js/AnimationConfig.js"></script>
-    <script src="js/states/Boot.js"></script>
-    <script src="js/states/Main.js"></script>
-    <script src="js/states/Gameover.js"></script>
+    <script src="js/states/boot.js"></script>
+    <script src="js/states/main.js"></script>
+    <script src="js/states/gameover.js"></script>
+    <script src="js/states/win.js"></script>
     <script src="js/Catformer.js"></script>
   </body>
 </html>

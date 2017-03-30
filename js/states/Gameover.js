@@ -1,4 +1,4 @@
-StateGameover = {
+states.gameover = {
 
     preload: function() {  
         game.time.advancedTiming = true;
@@ -70,6 +70,9 @@ StateGameover = {
 
     },
 
+    /**
+     * Plays the death animation/sound
+     */
     killPlayer: function() {
         player.loadTexture('cat-die', 0, false);
         player.animations.play('die');
@@ -77,14 +80,8 @@ StateGameover = {
     },
 
     /**
-     * Creates the music
-     * will not restart if it is already playing
+     * Prints the text to the screen
      */
-    createMusic: function() {
-        music = game.add.audio('bg-music');
-        music.play('', 0, 1, true, false);
-    },    
-
     createText: function() {
         var bar = game.add.graphics();
         bar.beginFill(0xff0000, 0.2);

@@ -1,4 +1,4 @@
-StateMain = {
+states.main = {
 
     preload: function() {  
         game.time.advancedTiming = true;
@@ -278,8 +278,7 @@ StateMain = {
         && player.body.position.y < endPoint[0].y + player.body.height
         && alive && !won) {
             won = true;
-            this.walkStop();
-            alert ("You win!");
+            game.state.start('win');
         }
     },
 
