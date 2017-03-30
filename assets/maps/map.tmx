@@ -35,7 +35,7 @@
   </data>
  </layer>
  <objectgroup name="startPoint">
-  <object id="1" x="-0.333333" y="416.333" width="62" height="63"/>
+  <object id="1" x="65.3333" y="416.333" width="62" height="62"/>
  </objectgroup>
  <objectgroup name="endPoint">
   <object id="2" x="3874.33" y="383" width="62" height="63"/>

@@ -4,13 +4,30 @@ StateMain = {
         game.time.advancedTiming = true;
         game.load.tilemap('map', 'assets/maps/map.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.image('mountains-bg', 'assets/png/mountains-bg-1024x512.png');
-        game.load.image('mountain-mg', 'assets/png/mountain-mg-512x512.png');
+        // game.load.image('mountain-mg', 'assets/png/mountain-mg-512x512.png');
         game.load.image('tileset', 'assets/png/tileset.png');
         game.load.image('player', 'assets/png/cat-walk.png');
-        game.load.spritesheet('cat-walk', 'assets/png/cat-walk.png', 34, 52, 10);
-        game.load.spritesheet('cat-jump', 'assets/png/cat-jump.png', 34, 52, 8);
-        game.load.spritesheet('cat-fall', 'assets/png/cat-fall.png', 34, 52, 8);
-        game.load.spritesheet('cat-dead', 'assets/png/cat-dead.png', 42, 52, 10);
+        game.load.spritesheet(
+            'cat-jump', 
+            AnimationConfig.cat.jump.filename,
+            AnimationConfig.cat.jump.frameWidth,
+            AnimationConfig.cat.jump.frameHeight,
+            AnimationConfig.cat.jump.frameCount
+        );
+        game.load.spritesheet(
+            'cat-idle', 
+            AnimationConfig.cat.idle.filename,
+            AnimationConfig.cat.idle.frameWidth,
+            AnimationConfig.cat.idle.frameHeight,
+            AnimationConfig.cat.idle.frameCount
+        );
+        game.load.spritesheet(
+            'cat-walk', 
+            AnimationConfig.cat.walk.filename,
+            AnimationConfig.cat.walk.frameWidth,
+            AnimationConfig.cat.walk.frameHeight,
+            AnimationConfig.cat.walk.frameCount
+        );
 
         game.load.audio(
             'bg-music', 
@@ -19,8 +36,11 @@ StateMain = {
             ]
         );
 
+        // reset values
         alive = true;
         won = false;
+        isJumping = false;
+        isHoldingUp = false;
     },
 
     create: function() {  
@@ -40,7 +60,7 @@ StateMain = {
     createWorld: function() {
         game.stage.backgroundColor = '#3598db';
 
-        map = game.add.tilemap('map', 32, 32, config.tilesWide, 16);
+        map = game.add.tilemap('map', 32, 32, GameConfig.tilesWide, 16);
         map.addTilesetImage('tileset', 'tileset');
 
         // add the sky and resize the world
@@ -71,10 +91,29 @@ StateMain = {
      */
     createPlayer: function() {
         // add the player
-        player = game.add.sprite(startPoint[0].x, startPoint[0].y, 'cat-walk');
-        player.animations.add('walk', null, 60, true);
-        player.animations.add('jump', null, 60, false);
-        player.animations.add('dead', null, 20, false);
+        player = game.add.sprite(
+            startPoint[0].x, 
+            startPoint[0].y, 
+            'cat-idle'
+        );
+        player.animations.add(
+            'idle', 
+            [0, 1], // the other 6 animations are not good
+            AnimationConfig.cat.idle.frameRate, 
+            true
+        );
+        player.animations.add(
+            'walk', 
+            null,
+            AnimationConfig.cat.walk.frameRate, 
+            true
+        );
+        player.animations.add(
+            'jump', 
+            null,
+            AnimationConfig.cat.jump.frameRate, 
+            true
+        );
         player.anchor.setTo(.5,.5);
 
         // the camera will follow the player in the world
@@ -120,7 +159,7 @@ StateMain = {
     },
 
     render: function() {
-        game.debug.text(game.time.fps || '--', 2, 14, "#ffffff");
+        game.debug.text("FPS: " + game.time.fps || 'FPS: --', 2, 14, "#ffffff");
     },
 
     /**
@@ -138,10 +177,6 @@ StateMain = {
     handleDeath: function() {
         if(player.body.position.y >= game.world.height - player.body.height
         && alive === true) {
-            this.walkStop();
-            var kill = false;
-            // player.loadTexture('cat-dead', 0, false);
-            // player.animations.play('dead', null, false, kill);
             alive = false;
             game.state.start('gameover');
         }
@@ -149,11 +184,31 @@ StateMain = {
 
     /**
      * Stops & starts walking
-     * @return {[type]} [description]
      */
     handleWalk: function() {
         if (!alive || won) {
             return;
+        }
+
+        if (!isJumping) {
+            player.animations.stop('jump', true);
+
+            // show the walking animation if we're currently walking
+            if (player.animations.currentAnim.name != "walk" && 
+            (cursors.left.isDown || cursors.right.isDown)) {
+                player.animations.stop('idle', true);
+                player.loadTexture('cat-walk');
+                player.animations.play('walk');
+
+
+            }
+            // show the idle animation if we're not walking 
+            else if (player.animations.currentAnim.name != "idle"
+            && (!cursors.left.isDown && !cursors.right.isDown)) {
+                player.animations.stop('walk', true);
+                player.loadTexture('cat-idle');
+                player.animations.play('idle', 5, true);
+            }
         }
 
         // movement
@@ -177,12 +232,39 @@ StateMain = {
      * Checks if a user is jumping and manages the jump
      */
     handleJump: function() {
-        if (cursors.up.isDown && player.body.onFloor() 
-        && game.time.now > jumpTimer)
-        {
-            player.body.velocity.y = -300;
-            jumpTimer = game.time.now + 250;
+        // toggle the jumping animation
+        if (!player.body.onFloor()) {
+            isJumping = true;
+            if (player.animations.currentAnim.name != "jump") {
+                player.animations.stop('idle', true);
+                player.animations.stop('walk', true);
+                player.loadTexture('cat-jump');
+                player.animations.play('jump', 60, true);
+            }
+        } else {
+            isJumping = false;
         }
+
+
+        // is the player holding the up button?
+        // avoid jumping immediately upon landing if so
+        if (isHoldingUp && !cursors.up.isDown)
+            isHoldingUp = false;
+        if (!isHoldingUp) {
+            if (cursors.up.isDown
+            && player.body.onFloor() 
+            && game.time.now > jumpTimer) {
+                isHoldingUp = true;
+                player.body.velocity.y = -300;
+                jumpTimer = game.time.now + 250;
+            }
+        }
+
+        // if (cursors.right.isDown) {
+        //     player.scale.x = 1;
+        // } else if (cursors.left.isDown) {
+        //     player.scale.x = -1;
+        // }
     },
 
     /** 
@@ -210,11 +292,9 @@ StateMain = {
         if (dir == "right") {
             player.scale.x = 1;
             player.body.velocity.x = 200;
-            player.animations.play('walk', 10, true);
         } else {
             player.scale.x = -1;
             player.body.velocity.x = -200;
-            player.animations.play('walk', 10, true);
         }
     },
 
@@ -223,6 +303,5 @@ StateMain = {
      */
     walkStop: function() {
         player.body.velocity.x = 0;
-        player.animations.stop(null, true);
     }
 };

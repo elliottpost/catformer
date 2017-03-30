@@ -42,14 +42,14 @@
          "name":"startPoint",
          "objects":[
                 {
-                 "height":63,
+                 "height":62,
                  "id":1,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":62,
-                 "x":-0.333333,
+                 "x":65.3333,
                  "y":416.333
                 }],
          "opacity":1,
