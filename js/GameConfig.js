@@ -2,7 +2,7 @@ GameConfig = {
     width: 1024,
     height: 512,
     renderer: Phaser.AUTO,
-    parent: 'body',
+    parent: '#catformer',
     scaleMode: Phaser.ScaleManager.SHOW_ALL,
     fullScreenScaleMode: Phaser.ScaleManager.SHOW_ALL,
     transparent: false,

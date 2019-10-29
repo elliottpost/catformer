@@ -39,6 +39,7 @@ states.win = {
 
         //  true = loop
         video.play(true);
+        this.handleRestart();
 
     },  
 
@@ -61,7 +62,7 @@ states.win = {
 
         setTimeout(function(){
             style.font = "bold 20px Arial";
-            var tryAgain = game.add.text(0, 0, "Hit Enter to Play Again", style);
+            var tryAgain = game.add.text(0, 0, "Refresh the page to play again", style);
             tryAgain.setTextBounds(
                 0, 
                 GameConfig.height - 65, 

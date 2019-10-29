@@ -44,6 +44,9 @@ states.main = {
     },
 
     create: function() {  
+
+        document.getElementById("loading").remove();
+
         this.createWorld();
         this.getObjectLayers();
         this.createPlayer();
